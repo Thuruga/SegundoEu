@@ -13,7 +13,6 @@ def generate_script(state: VideoState) -> VideoState:
     """
     print(f"--- Generating script for topic: '{state['topic']}' ---")
     
-    # Iniciando o Llama 3.3 70B rodando nos processadores ultrarrápidos da Groq
     llm = ChatGroq(
         model="llama-3.3-70b-versatile",
         temperature=0.7,
