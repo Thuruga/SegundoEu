@@ -12,23 +12,23 @@ Setup LangGraph state and Agent 1 to generate scripts.
 
 ## Tasks
 
-- [ ] **Task 1: Setup project structure and dependencies**
+- [x] **Task 1: Setup project structure and dependencies**
   - Create standard Python project layout (`src/`, `tests/`, `requirements.txt`).
   - Add `langgraph`, `langchain-google-genai`, `python-dotenv`.
-- [ ] **Task 2: Define State Schema**
+- [x] **Task 2: Define State Schema**
   - Create `src/state.py`.
   - Define `VideoState` as a `TypedDict` with fields: `script`, `audio_path`, `video_path`, `final_video_path`, `status`.
-- [ ] **Task 3: Implement Agent 1 (Scriptwriter)**
+- [x] **Task 3: Implement Agent 1 (Scriptwriter)**
   - Create `src/agents/scriptwriter.py`.
   - Use `ChatGoogleGenerativeAI` (Gemini Pro).
   - Define prompt: "Write a 1-minute reflective, philosophical script (Shortsophy style) about {topic}."
-- [ ] **Task 4: Implement Orchestrator (LangGraph)**
+- [x] **Task 4: Implement Orchestrator (LangGraph)**
   - Create `src/graph.py`.
   - Initialize `StateGraph` with `VideoState`.
   - Add `scriptwriter` node.
   - Set entry point to `scriptwriter` and add an edge from `scriptwriter` to END.
   - Compile the graph.
-- [ ] **Task 5: Create Entry Point**
+- [x] **Task 5: Create Entry Point**
   - Create `src/main.py`.
   - Allow running the graph with a test topic.
 
