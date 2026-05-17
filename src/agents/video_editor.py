@@ -163,12 +163,6 @@ def assemble_video(state: VideoState) -> VideoState:
 
     bg_cropped = bg_cropped.with_fps(TARGET_FPS)
 
-    dark_overlay = (
-        ColorClip(size=(OUTPUT_WIDTH, OUTPUT_HEIGHT), color=[0, 0, 0])
-        .with_duration(total_duration)
-        .with_opacity(0.35) # Ajuste entre 0.3 e 0.5 conforme o gosto
-    )
-
     # 4. Parse subtitles and build ImageClip overlays
     subtitle_entries = _parse_srt(subtitles_path)
     subtitle_clips   = []
@@ -206,12 +200,15 @@ def assemble_video(state: VideoState) -> VideoState:
         print("    No music files found in assets/music/ – using voiceover only")
 
     # 6. Composite all layers: background + subtitles
-    all_layers = [bg_cropped] + subtitle_clips
+    dark_overlay = (
+        ColorClip(size=(OUTPUT_WIDTH, OUTPUT_HEIGHT), color=[0, 0, 0])
+        .with_duration(total_duration)
+        .with_opacity(0.35)
+    )
+    all_layers = [bg_cropped, dark_overlay] + subtitle_clips
     final_video = CompositeVideoClip(all_layers, size=(OUTPUT_WIDTH, OUTPUT_HEIGHT))
     final_video = final_video.with_audio(final_audio)
     final_video = final_video.with_duration(total_duration)
-
-    all_layers = [bg_cropped, dark_overlay] + subtitle_clips
 
     # 7. Export
     os.makedirs("assets/output", exist_ok=True)

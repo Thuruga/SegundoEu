@@ -39,6 +39,8 @@ progress:
 | `scriptwriter-word-count-rhythm` | 2026-05-17 | Ajuste das STRICT RULES para 120-140 palavras (Regra 3) e legendas de 2-5 palavras sem encurtar a história (Regra 5) |
 | `scriptwriter-in-context-learning` | 2026-05-17 | Implementação de In-Context Learning com exemplo prático e exigência de vírgulas frequentes para ditar o ritmo das legendas |
 | `video-editor-typography-update` | 2026-05-17 | Atualização das constantes de tipografia (FONT_SIZE=65, STROKE_WIDTH=4, SUBTITLE_Y=0.60) no video_editor |
+| `video-editor-dark-overlay-fix` | 2026-05-17 | Correção estrutural na declaração do dark_overlay e da lista all_layers garantindo a composição correta |
+
 
 
 
