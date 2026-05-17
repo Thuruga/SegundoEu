@@ -1,3 +1,21 @@
+---
+wave: 1
+depends_on: []
+files_modified:
+  - src/state.py
+  - src/agents/voice_actor.py
+  - src/agents/video_editor.py
+  - src/graph.py
+  - src/main.py
+autonomous: true
+must_haves:
+  truths:
+    - src/agents/video_editor.py exists and defines assemble_video()
+    - voice_actor.py streams with boundary=WordBoundary and writes .srt to assets/subtitles/
+    - graph.py routes media_researcher → video_editor → END
+    - VideoState contains subtitles_path field
+---
+
 # Phase 3: Video Assembly - Plan
 
 We will implement **Agent 4 (Video Editor)** to composite the final vertical portrait Shortsophy-style video at 1080x1920 (9:16). This includes:
