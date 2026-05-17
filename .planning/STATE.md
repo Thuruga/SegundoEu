@@ -35,4 +35,6 @@ progress:
 | Slug | Date | Description |
 |---|---|---|
 | `scriptwriter-visual-rhythm` | 2026-05-17 | Atualização do ritmo visual (regra 5) e keywords dark/moody/minimalist no scriptwriter |
+| `video-editor-dark-overlay` | 2026-05-17 | Alterações estéticas na fonte (Montserrat-Black 90px) e adição de dark overlay (opacidade 0.35) no video_editor |
+
 

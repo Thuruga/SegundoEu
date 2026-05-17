@@ -9,6 +9,7 @@ from moviepy import (
     VideoFileClip,
     AudioFileClip,
     ImageClip,
+    ColorClip,
     CompositeVideoClip,
 )
 from moviepy.audio.AudioClip import CompositeAudioClip
@@ -21,10 +22,9 @@ OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
 TARGET_FPS = 30
 
-# Font settings
-FONT_PATH = "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"
-FONT_SIZE = 80
-STROKE_WIDTH = 6
+FONT_PATH = "./assets/fonts/Montserrat-Black.ttf"
+FONT_SIZE = 90
+STROKE_WIDTH = 8
 
 # Subtitle position: lower-middle (73% down the canvas)
 SUBTITLE_Y = int(OUTPUT_HEIGHT * 0.73)
@@ -163,6 +163,12 @@ def assemble_video(state: VideoState) -> VideoState:
 
     bg_cropped = bg_cropped.with_fps(TARGET_FPS)
 
+    dark_overlay = (
+        ColorClip(size=(OUTPUT_WIDTH, OUTPUT_HEIGHT), color=[0, 0, 0])
+        .with_duration(total_duration)
+        .with_opacity(0.35)
+    )
+
     # 4. Parse subtitles and build ImageClip overlays
     subtitle_entries = _parse_srt(subtitles_path)
     subtitle_clips   = []
@@ -200,7 +206,7 @@ def assemble_video(state: VideoState) -> VideoState:
         print("    No music files found in assets/music/ – using voiceover only")
 
     # 6. Composite all layers: background + subtitles
-    all_layers = [bg_cropped] + subtitle_clips
+    all_layers = [bg_cropped, dark_overlay] + subtitle_clips
     final_video = CompositeVideoClip(all_layers, size=(OUTPUT_WIDTH, OUTPUT_HEIGHT))
     final_video = final_video.with_audio(final_audio)
     final_video = final_video.with_duration(total_duration)
