@@ -1,6 +1,9 @@
-# Phase 3: Video Assembly Plan
+# Phase 3: Video Assembly - Plan
 
-We will implement **Agent 4 (Video Editor)** to composite the final Shortsophy-style video: merging the generated Voiceover (`.mp3`) and Background Video (`.mp4`), generating and parsing sub-second subtitles, and overlaying high-quality, auto-wrapped, styled subtitles onto the final video using `MoviePy` and `Pillow`.
+We will implement **Agent 4 (Video Editor)** to composite the final vertical portrait Shortsophy-style video at 1080x1920 (9:16). This includes:
+1. Modifying **Agent 2 (Voice Actor)** to generate sub-second word boundaries, group them into natural 2-3 word phrases, and output a valid `.srt` file.
+2. Implementing **Agent 4 (Video Editor)** to perform a seamless **Crop-to-Fill** center crop normalization, render crisp transparent outline subtitles using **Pillow**, and mix background music with a **Configurable Fallback** ducking system.
+3. Updating **LangGraph Orchestrator** in `src/graph.py` to route the state through the new agent node.
 
 ---
 
@@ -10,34 +13,72 @@ We will implement **Agent 4 (Video Editor)** to composite the final Shortsophy-s
 Add `moviepy` and `pillow` to `requirements.txt`.
 
 ### Abstractions & State
-Extend `VideoState` in `src/state.py` with `subtitles_path: Optional[str]`.
+#### `src/state.py`
+- Extend `VideoState` to track `subtitles_path: Optional[str]`.
+
+---
 
 ### Agent Updates
 
-#### `src/agents/voice_actor.py`
-* Collect `SentenceBoundary` frames using `edge_tts.SubMaker`.
-* Save the generated `.srt` subtitles under `assets/subtitles/the_meaning_of_time_{timestamp}.srt`.
-* Update the node state with `new_state["subtitles_path"] = subtitles_path`.
+#### [MODIFY] `src/agents/voice_actor.py`(file:///home/zallu/Documentos/Projetos%20Zallu/Segundo%20eu/src/agents/voice_actor.py)
+* Update `generate_audio` to request `boundary="WordBoundary"` in `edge_tts.Communicate`.
+* Collect all word timing metadata blocks yielded by the stream.
+* Implement a grouping algorithm to chunk words into **2-3 word phrases** (completing a chunk if it reaches 3 words or if a word contains punctuation like `. , ! ? ; :`).
+* Generate standard `.srt` format content using the phrase timestamps.
+* Save the `.srt` subtitles under `assets/subtitles/{slug}_{timestamp}.srt`.
+* Update the returned state with `new_state["subtitles_path"] = subtitles_path` and status `"audio_generated"`.
 
-#### `src/agents/video_editor.py` [NEW]
-Create the Video Editor agent node:
+#### [NEW] `src/agents/video_editor.py`(file:///home/zallu/Documentos/Projetos%20Zallu/Segundo%20eu/src/agents/video_editor.py)
+Create the new Video Editor agent:
 * Read `audio_path`, `video_path`, `subtitles_path`, and `video_needs_loop` from `VideoState`.
-* Loop the background video using `moviepy.video.fx.all.loop` if `video_needs_loop` is True, matching the exact duration of the audio clip.
-* Crop/resize the background video to vertical portrait format (1080x1920 or native aspect ratio) if needed.
-* Parse the `.srt` subtitles file.
-* Use **Pillow** to render high-contrast, wrapped, centered text frames (white font with a thin black border/shadow) on a transparent background.
-* Overlay the subtitle image clips onto the video timeline at the exact timestamps.
-* Render the final video with default codecs (`libx264` for video, `aac` for audio).
-* Write the resulting vertical video to `assets/output/the_meaning_of_time_{timestamp}.mp4`.
+* Load the background video using `VideoFileClip`.
+* **Crop-to-Fill Normalization:**
+  * Compare the video's aspect ratio to 9:16 (1080x1920).
+  * Scale the video so that it covers 1080x1920 entirely (ensuring no letterboxing/black bars).
+  * Crop the scaled video centered horizontally and vertically to exactly 1080x1920.
+* **Video Looping:** Loop/extend the background video using `.loop(duration=...)` if its duration is shorter than the voiceover audio clip.
+* **Subtitle Rendering (Pillow):**
+  * Parse the `.srt` file to extract phrase start, end, and text.
+  * For each phrase, generate a transparent `RGBA` 1080x1920 canvas using `Pillow`.
+  * Style subtitles: Bold white font with a thick black stroke/outline (e.g. `stroke_width=5`, `stroke_fill="black"`).
+  * Center the text horizontally and offset it in the lower-middle portion of the screen (typically `y = 1400` of the 1920 height).
+  * Convert PIL images directly to numpy arrays in-memory to initialize MoviePy `ImageClip`s, avoiding unnecessary disk writes.
+* **Configurable Background Music:**
+  * Scan `assets/music/` for `.mp3` files.
+  * If found, select one randomly, apply volume ducking (e.g., `.volumex(0.1)`), loop/clip it to cover the full duration, and mix it under the voiceover clip using `CompositeAudioClip`.
+  * If the folder is empty or doesn't exist, gracefully fallback to the voiceover audio track only.
+* **Composite & Export:**
+  * Overlay the subtitle image clips onto the normalized video.
+  * Write the final composite vertical video to `assets/output/{slug}_{timestamp}.mp4` using H.264 video codec (`libx264`) and AAC audio codec (`aac`).
+  * Return the state updated with `final_video_path` and `status="video_assembled"`.
+
+---
+
+### Pipeline Orchestration
+
+#### [MODIFY] `src/graph.py`(file:///home/zallu/Documentos/Projetos%20Zallu/Segundo%20eu/src/graph.py)
+* Register the `video_editor` node.
+* Update edges: `media_researcher` -> `video_editor` -> `END`.
+
+#### [MODIFY] `src/main.py`(file:///home/zallu/Documentos/Projetos%20Zallu/Segundo%20eu/src/main.py)
+* Update output logging to display `final_video_path` on completion.
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-- Run `PYTHONPATH=. .venv/bin/python src/main.py` end-to-end.
-- Assert `final_video_path` exists in `assets/output/`.
-- Verify the video file has valid duration, video track (portrait aspect ratio), and audio track.
+* Run `PYTHONPATH=. .venv/bin/python src/main.py` end-to-end.
+* Assert that the generated file under `assets/output/` exists.
+* Programmatically verify:
+  - Video resolution is exactly 1080x1920.
+  - Video duration matches the audio voiceover duration.
+  - Video contains both valid video and audio tracks.
 
 ### Manual Verification
-- Play the generated video to verify subtitle centering, contrast, readability, and correct synchronization with the voice.
+* Play the generated `.mp4` video locally.
+* Verify:
+  - Center crop is perfect (no distortion or letterboxing).
+  - Subtitles appear in natural 2-3 word chunks centered in the lower-middle section.
+  - Subtitles have perfect contrast (crisp white text with a solid black outline).
+  - Background music is mixed at a calm, supportive volume without overpowering the voiceover.
