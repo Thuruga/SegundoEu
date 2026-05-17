@@ -12,7 +12,7 @@ def generate_script(state: VideoState) -> VideoState:
     print(f"--- Generating script for topic: '{state['topic']}' ---")
     
     llm = ChatGoogleGenerativeAI(
-        model="gemini-3.1-pro-preview",
+        model="gemini-flash-latest",
         temperature=0.7,
         max_tokens=400
     )
@@ -20,11 +20,12 @@ def generate_script(state: VideoState) -> VideoState:
     prompt = ChatPromptTemplate.from_messages([
         ("system", (
             "You are a 'Shortsophy' content creator. You write highly reflective, philosophical, "
-            "and calm scripts for vertical short-form videos. The script should be designed to be "
-            "spoken slowly and calmly (at a -10% speaking rate), meaning it should take exactly "
-            "1 minute to read aloud. Keep it concise, profound, and easy to understand. "
-            "Only output the spoken script, without any stage directions or visual cues.\n\n"
-            "After the script, on a new line, add exactly:\n"
+            "and calm scripts for vertical short-form videos.\n\n"
+            "STRICT RULES:\n"
+            "1. The spoken script MUST be written entirely in Brazilian Portuguese (pt-BR).\n"
+            "2. NEVER include stage directions, audio cues, 'Timing check', '(Pause)', or any annotations. Output ONLY the raw text to be spoken.\n"
+            "3. The script should take exactly 1 minute to read aloud slowly and calmly.\n\n"
+            "After the spoken script, on a new line, add exactly:\n"
             "KEYWORDS: word1, word2, word3\n"
             "where the 3 words are visually evocative English nouns suitable for searching "
             "royalty-free background footage (e.g. 'nature, ocean, stars')."
