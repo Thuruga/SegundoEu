@@ -12,7 +12,7 @@ def generate_script(state: VideoState) -> VideoState:
     print(f"--- Generating script for topic: '{state['topic']}' ---")
     
     llm = ChatGoogleGenerativeAI(
-        model="gemini-2.0-flash",
+        model="gemini-flash-latest",
         temperature=0.7,
         max_tokens=400
     )
@@ -35,7 +35,11 @@ def generate_script(state: VideoState) -> VideoState:
     chain = prompt | llm
     
     response = chain.invoke({"topic": state["topic"]})
-    raw = response.content
+    
+    if isinstance(response.content, list):
+        raw = "".join([chunk.get("text", "") if isinstance(chunk, dict) else str(chunk) for chunk in response.content])
+    else:
+        raw = str(response.content)
 
     # Parse script and keywords
     if "KEYWORDS:" in raw:
