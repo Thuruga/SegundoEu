@@ -29,3 +29,10 @@ progress:
 - **LangGraph** orchestration is central to the project.
 - **edge-tts**, **Pexels API**, and **YouTube Data API v3** are external dependencies.
 - **MoviePy** will be used for video editing and subtitling.
+
+## Quick Tasks Completed
+
+| Slug | Date | Description |
+|---|---|---|
+| `scriptwriter-visual-rhythm` | 2026-05-17 | Atualização do ritmo visual (regra 5) e keywords dark/moody/minimalist no scriptwriter |
+
