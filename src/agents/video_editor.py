@@ -12,6 +12,8 @@ from moviepy import (
     CompositeVideoClip,
 )
 from moviepy.audio.AudioClip import CompositeAudioClip
+from moviepy.video.fx import Loop as vfx_Loop
+from moviepy.audio.fx import AudioLoop as afx_AudioLoop
 from src.state import VideoState
 
 # ─── Constants ────────────────────────────────────────────────────────────────
@@ -155,8 +157,7 @@ def assemble_video(state: VideoState) -> VideoState:
     # 3. Loop if shorter than voiceover
     if bg_cropped.duration < total_duration:
         print(f"    Background video ({bg_cropped.duration:.1f}s) shorter than audio – looping")
-        bg_cropped = bg_cropped.with_effects([])  # force a copy
-        bg_cropped = bg_cropped.loop(duration=total_duration)
+        bg_cropped = bg_cropped.with_effects([vfx_Loop(duration=total_duration)])
     else:
         bg_cropped = bg_cropped.subclipped(0, total_duration)
 
@@ -190,7 +191,7 @@ def assemble_video(state: VideoState) -> VideoState:
         music_clip = music_clip.with_volume_scaled(MUSIC_VOLUME)
 
         if music_clip.duration < total_duration:
-            music_clip = music_clip.loop(duration=total_duration)
+            music_clip = music_clip.with_effects([afx_AudioLoop(duration=total_duration)])
         else:
             music_clip = music_clip.subclipped(0, total_duration)
 
