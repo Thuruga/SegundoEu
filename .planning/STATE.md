@@ -43,6 +43,8 @@ progress:
 | `code-review-fixes` | 2026-05-17 | Fix: remoção da regra de vírgulas forçadas, keywords reforçadas em inglês, e FONT_PATH absoluto com warning audível |
 | `voice-actor-cleanup` | 2026-05-17 | Limpeza do bloco antigo/duplicado de geração de legendas no voice_actor para evitar sobrescrita do SRT |
 | `scriptwriter-emphasis-and-state` | 2026-05-17 | Mudança para `video_paths` no state.py e atualização do scriptwriter para gerar ênfases com asteriscos e 3-4 Cenas distintas nas keywords |
+| `media-researcher-iteration` | 2026-05-17 | Lógica iterativa no media_researcher para descarregar múltiplos vídeos HD para cada keyword e agregá-los na lista video_paths do state |
+
 
 
 
