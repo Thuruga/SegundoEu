@@ -42,6 +42,8 @@ progress:
 | `video-editor-dark-overlay-fix` | 2026-05-17 | Correção estrutural na declaração do dark_overlay e da lista all_layers garantindo a composição correta |
 | `code-review-fixes` | 2026-05-17 | Fix: remoção da regra de vírgulas forçadas, keywords reforçadas em inglês, e FONT_PATH absoluto com warning audível |
 | `voice-actor-cleanup` | 2026-05-17 | Limpeza do bloco antigo/duplicado de geração de legendas no voice_actor para evitar sobrescrita do SRT |
+| `scriptwriter-emphasis-and-state` | 2026-05-17 | Mudança para `video_paths` no state.py e atualização do scriptwriter para gerar ênfases com asteriscos e 3-4 Cenas distintas nas keywords |
+
 
 
 

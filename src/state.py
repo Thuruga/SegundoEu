@@ -7,7 +7,7 @@ class VideoState(TypedDict):
     topic: str
     script: Optional[str]
     audio_path: Optional[str]
-    video_path: Optional[str]
+    video_paths: Optional[List[str]]
     final_video_path: Optional[str]
     keywords: Optional[List[str]]
     video_needs_loop: Optional[bool]
