@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional
+from typing import TypedDict, Optional, List
 
 class VideoState(TypedDict):
     """
@@ -9,4 +9,6 @@ class VideoState(TypedDict):
     audio_path: Optional[str]
     video_path: Optional[str]
     final_video_path: Optional[str]
+    keywords: Optional[List[str]]
+    video_needs_loop: Optional[bool]
     status: str

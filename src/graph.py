@@ -1,25 +1,26 @@
 from langgraph.graph import StateGraph, END
 from src.state import VideoState
 from src.agents.scriptwriter import generate_script
+from src.agents.voice_actor import generate_audio
+from src.agents.media_researcher import fetch_video
 
 def build_graph():
     """
     Builds the LangGraph orchestration pipeline for Shortsophy.
+    Phase 2: scriptwriter → voice_actor → media_researcher → END
     """
-    # Initialize the state graph
     workflow = StateGraph(VideoState)
-    
-    # Add nodes (agents)
+
+    # Add agent nodes
     workflow.add_node("scriptwriter", generate_script)
-    
-    # Currently we only have Agent 1 implemented for Phase 1.
-    # Future phases will add more nodes here.
-    
-    # Define edges
+    workflow.add_node("voice_actor", generate_audio)
+    workflow.add_node("media_researcher", fetch_video)
+
+    # Define sequential pipeline edges
     workflow.set_entry_point("scriptwriter")
-    workflow.add_edge("scriptwriter", END)
-    
-    # Compile the graph
+    workflow.add_edge("scriptwriter", "voice_actor")
+    workflow.add_edge("voice_actor", "media_researcher")
+    workflow.add_edge("media_researcher", END)
+
     app = workflow.compile()
-    
     return app

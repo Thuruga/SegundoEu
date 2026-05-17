@@ -5,17 +5,21 @@ from src.state import VideoState
 
 def main():
     load_dotenv()
-    
+
     if not os.getenv("GOOGLE_API_KEY"):
         print("Error: GOOGLE_API_KEY is not set. Please create a .env file and add your API key.")
         return
-        
+
+    if not os.getenv("PEXELS_API_KEY"):
+        print("Error: PEXELS_API_KEY is not set. Please add it to your .env file.")
+        return
+
     topic = "The meaning of time"
     print(f"Starting Shortsophy Pipeline for topic: {topic}\n")
-    
+
     # Initialize pipeline
     app = build_graph()
-    
+
     # Create initial state
     initial_state = VideoState(
         topic=topic,
@@ -23,14 +27,20 @@ def main():
         audio_path=None,
         video_path=None,
         final_video_path=None,
+        keywords=None,
+        video_needs_loop=None,
         status="started"
     )
-    
+
     # Run pipeline
     result = app.invoke(initial_state)
-    
+
     print("\n--- Pipeline Execution Complete ---")
     print(f"Final Status: {result['status']}")
+    print(f"Keywords:     {result.get('keywords', [])}")
+    print(f"Audio Path:   {result.get('audio_path', 'N/A')}")
+    print(f"Video Path:   {result.get('video_path', 'N/A')}")
+    print(f"Video Loop:   {result.get('video_needs_loop', False)}")
     print("\nGenerated Script:")
     print("-" * 40)
     print(result["script"])
