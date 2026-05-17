@@ -11,6 +11,7 @@ from moviepy import (
     ImageClip,
     ColorClip,
     CompositeVideoClip,
+    concatenate_videoclips,
 )
 from moviepy.audio.AudioClip import CompositeAudioClip
 from moviepy.video.fx import Loop as vfx_Loop
@@ -71,7 +72,8 @@ def _srt_timestamp_to_seconds(ts: str) -> float:
 def _render_subtitle_frame(text: str, width: int, height: int, y_center: int) -> np.ndarray:
     """
     Render a single subtitle phrase onto a transparent RGBA canvas.
-    White text with thick black stroke/outline. Returns a numpy RGBA array.
+    Renders word by word. If a word contains an *asterisk*, it removes the asterisks 
+    and paints it yellow to show emphasis.
     """
     img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
@@ -84,23 +86,44 @@ def _render_subtitle_frame(text: str, width: int, height: int, y_center: int) ->
         print(f"    ⚠️  Falling back to default font — subtitles will look generic!")
         font = ImageFont.load_default()
 
-    # Measure text dimensions
-    bbox = draw.textbbox((0, 0), text, font=font, stroke_width=STROKE_WIDTH)
-    text_width  = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
+    words = text.split()
+    word_surfaces = []
+    total_text_width = 0
+    max_height = 0
+    
+    # Space width
+    space_width = draw.textbbox((0, 0), " ", font=font, stroke_width=STROKE_WIDTH)[2]
+    
+    for word in words:
+        is_emphasis = "*" in word
+        clean_word = word.replace("*", "")
+        
+        color = (255, 215, 0, 255) if is_emphasis else (255, 255, 255, 255) # Yellow or White
+        
+        bbox = draw.textbbox((0, 0), clean_word, font=font, stroke_width=STROKE_WIDTH)
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
+        
+        word_surfaces.append({"text": clean_word, "width": w, "color": color})
+        total_text_width += w
+        if h > max_height:
+            max_height = h
+            
+    total_text_width += space_width * (max(0, len(words) - 1))
+    
+    current_x = (width - total_text_width) // 2
+    y = y_center - max_height // 2
 
-    x = (width - text_width) // 2
-    y = y_center - text_height // 2
-
-    # Draw black outline / stroke
-    draw.text(
-        (x, y),
-        text,
-        font=font,
-        fill=(255, 255, 255, 255),
-        stroke_width=STROKE_WIDTH,
-        stroke_fill=(0, 0, 0, 255),
-    )
+    for ws in word_surfaces:
+        draw.text(
+            (current_x, y),
+            ws["text"],
+            font=font,
+            fill=ws["color"],
+            stroke_width=STROKE_WIDTH,
+            stroke_fill=(0, 0, 0, 255),
+        )
+        current_x += ws["width"] + space_width
 
     return np.array(img)
 
@@ -137,13 +160,13 @@ def assemble_video(state: VideoState) -> VideoState:
     into a final 1080×1920 portrait MP4 (H.264 / AAC).
     """
     audio_path     = state.get("audio_path")
-    video_path     = state.get("video_path")
+    video_paths    = state.get("video_paths")
     subtitles_path = state.get("subtitles_path")
 
     if not audio_path or not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
-    if not video_path or not os.path.exists(video_path):
-        raise FileNotFoundError(f"Background video not found: {video_path}")
+    if not video_paths or len(video_paths) == 0:
+        raise ValueError(f"No background videos found in state 'video_paths'.")
     if not subtitles_path or not os.path.exists(subtitles_path):
         raise FileNotFoundError(f"Subtitles file not found: {subtitles_path}")
 
@@ -154,26 +177,44 @@ def assemble_video(state: VideoState) -> VideoState:
     total_duration = voiceover.duration
     print(f"    Voiceover duration: {total_duration:.2f}s")
 
-    # 2. Load and normalise background video
-    bg_raw = VideoFileClip(video_path)
-    bg_cropped = _crop_to_fill(bg_raw, OUTPUT_WIDTH, OUTPUT_HEIGHT)
+    # 2. Load, crop and concatenate all background videos
+    bg_clips = []
+    for vp in video_paths:
+        if not os.path.exists(vp):
+            print(f"    ⚠️ Warning: Video path not found {vp}")
+            continue
+        raw_clip = VideoFileClip(vp)
+        cropped = _crop_to_fill(raw_clip, OUTPUT_WIDTH, OUTPUT_HEIGHT)
+        bg_clips.append(cropped)
+    
+    if not bg_clips:
+        raise FileNotFoundError("Could not load any of the background videos.")
+        
+    bg_sequence = concatenate_videoclips(bg_clips, method="compose")
 
     # 3. Loop if shorter than voiceover
-    if bg_cropped.duration < total_duration:
-        print(f"    Background video ({bg_cropped.duration:.1f}s) shorter than audio – looping")
-        bg_cropped = bg_cropped.with_effects([vfx_Loop(duration=total_duration)])
+    if bg_sequence.duration < total_duration:
+        print(f"    Background sequence ({bg_sequence.duration:.1f}s) shorter than audio – looping")
+        bg_cropped = bg_sequence.with_effects([vfx_Loop(duration=total_duration)])
     else:
-        bg_cropped = bg_cropped.subclipped(0, total_duration)
+        bg_cropped = bg_sequence.subclipped(0, total_duration)
 
     bg_cropped = bg_cropped.with_fps(TARGET_FPS)
 
-    # 4. Parse subtitles and build ImageClip overlays
+    # 4. Parse subtitles, build ImageClip overlays, and add SFX
     subtitle_entries = _parse_srt(subtitles_path)
     subtitle_clips   = []
+    sfx_clips        = []
+    
+    sfx_files = sorted(glob.glob("assets/sfx/*.mp3"))
+    has_sfx = len(sfx_files) > 0
 
     for entry in subtitle_entries:
+        text = entry["text"]
+        has_asterisk = "*" in text
+        
         frame  = _render_subtitle_frame(
-            entry["text"], OUTPUT_WIDTH, OUTPUT_HEIGHT, SUBTITLE_Y
+            text, OUTPUT_WIDTH, OUTPUT_HEIGHT, SUBTITLE_Y
         )
         clip = (
             ImageClip(frame)
@@ -181,12 +222,20 @@ def assemble_video(state: VideoState) -> VideoState:
             .with_duration(entry["end"] - entry["start"])
         )
         subtitle_clips.append(clip)
+        
+        if has_asterisk and has_sfx:
+            # Pick a random SFX and add it at the start_time of this subtitle
+            sfx_file = random.choice(sfx_files)
+            sfx_clip = AudioFileClip(sfx_file).with_start(entry["start"])
+            sfx_clips.append(sfx_clip)
 
     print(f"    Built {len(subtitle_clips)} subtitle overlay clips")
+    if sfx_clips:
+        print(f"    Built {len(sfx_clips)} SFX audio clips for emphasis")
 
-    # 5. Configurable background music with ducking
+    # 5. Configurable background music with ducking and SFX mix
     music_files = sorted(glob.glob("assets/music/*.mp3"))
-    final_audio = voiceover
+    audio_layers = [voiceover]
 
     if music_files:
         music_file = random.choice(music_files)
@@ -199,9 +248,14 @@ def assemble_video(state: VideoState) -> VideoState:
         else:
             music_clip = music_clip.subclipped(0, total_duration)
 
-        final_audio = CompositeAudioClip([voiceover, music_clip])
+        audio_layers.append(music_clip)
     else:
         print("    No music files found in assets/music/ – using voiceover only")
+        
+    if sfx_clips:
+        audio_layers.extend(sfx_clips)
+        
+    final_audio = CompositeAudioClip(audio_layers)
 
     # 6. Composite all layers: background + subtitles
     dark_overlay = (
