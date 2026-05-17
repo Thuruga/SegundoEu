@@ -74,31 +74,45 @@ async def _save_audio_and_subtitles(
                     "duration": chunk["duration"] / 10000000.0
                 })
                 
-    # Group words into 2-3 word phrases
+    # Group words into logical phrases using time gaps (pauses) instead of missing punctuation
     phrases = []
     current_group = []
     
-    for word in words:
+    for i, word in enumerate(words):
         current_group.append(word)
-        word_text = word["text"]
-        # Check for punctuation to end the current phrase early
-        has_punctuation = any(char in word_text for char in [".", ",", "!", "?", ";", ":"])
         
-        if len(current_group) >= 3 or has_punctuation:
+        break_phrase = False
+        # Regra 1: Tamanho máximo de 3 palavras para ficar limpo na tela
+        if len(current_group) >= 3:
+            break_phrase = True
+        # Regra 2: Se houver um silêncio (gap) maior que 0.15s, significa que houve uma vírgula/ponto! Corta a frase.
+        elif i < len(words) - 1:
+            next_word = words[i+1]
+            word_end = word["start"] + word["duration"]
+            gap = next_word["start"] - word_end
+            if gap > 0.15: # 150ms de pausa
+                break_phrase = True
+                
+        if break_phrase or i == len(words) - 1:
             phrases.append(current_group)
             current_group = []
             
-    if current_group:
-        phrases.append(current_group)
-        
     # Generate SRT formatted lines
     srt_lines = []
-    for i, phrase in enumerate(phrases, 1):
+    AUDIO_OFFSET = 0.05 # Compensa o atraso de decodificação do MP3 no MoviePy
+    
+    for i, phrase in enumerate(phrases):
         phrase_text = " ".join(w["text"] for w in phrase)
-        start_time = phrase[0]["start"]
-        end_time = phrase[-1]["start"] + phrase[-1]["duration"]
+        start_time = phrase[0]["start"] + AUDIO_OFFSET
         
-        srt_lines.append(str(i))
+        # Estica a legenda até a próxima começar. Isso mantém o texto na tela 
+        # durante as pausas, evitando que ela "pisque" ou desapareça antes do tom acabar.
+        if i < len(phrases) - 1:
+            end_time = phrases[i+1][0]["start"] + AUDIO_OFFSET - 0.05
+        else:
+            end_time = phrase[-1]["start"] + phrase[-1]["duration"] + AUDIO_OFFSET + 0.5
+            
+        srt_lines.append(str(i + 1))
         srt_lines.append(f"{_format_timestamp(start_time)} --> {_format_timestamp(end_time)}")
         srt_lines.append(phrase_text)
         srt_lines.append("")
@@ -106,3 +120,4 @@ async def _save_audio_and_subtitles(
     # Save the subtitle file
     with open(subtitles_path, "w", encoding="utf-8") as srt_file:
         srt_file.write("\n".join(srt_lines))
+
