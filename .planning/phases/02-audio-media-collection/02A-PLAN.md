@@ -24,7 +24,7 @@ Extend the LangGraph state schema with `keywords` and `video_needs_loop` fields,
 - src/agents/scriptwriter.py — current Agent 1 implementation and prompt structure
 - .planning/phases/02-audio-media-collection/02-CONTEXT.md — locked decisions D-01 through D-08
 - .planning/phases/02-audio-media-collection/02-RESEARCH.md — edge-tts API patterns, voice names, rate format
-- .env — current env vars (GOOGLE_API_KEY)
+- .env — current env vars (GROQ_API_KEY)
 - requirements.txt — current dependencies list
 </read_first>
 

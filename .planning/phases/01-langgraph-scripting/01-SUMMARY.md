@@ -13,7 +13,7 @@ Setup LangGraph state and Agent 1 to generate scripts.
 5. **Create Entry Point**: Created `src/main.py` to trigger the pipeline locally.
 
 ## Issues Encountered & Resolved
-- None. Setup went smoothly. Verified graceful failure when `GOOGLE_API_KEY` is missing.
+- None. Setup went smoothly. Verified graceful failure when `GROQ_API_KEY` is missing.
 
 ## Next Steps
 - Verify execution via `gsd-verify-work`.

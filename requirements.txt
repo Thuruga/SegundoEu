@@ -3,3 +3,5 @@ langchain-google-genai
 python-dotenv
 edge-tts
 requests
+moviepy
+pillow

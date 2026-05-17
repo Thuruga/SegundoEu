@@ -6,8 +6,8 @@ from src.state import VideoState
 def main():
     load_dotenv()
 
-    if not os.getenv("GOOGLE_API_KEY"):
-        print("Error: GOOGLE_API_KEY is not set. Please create a .env file and add your API key.")
+    if not os.getenv("GROQ_API_KEY"):
+        print("Error: GROQ_API_KEY is not set. Please create a .env file and add your API key.")
         return
 
     if not os.getenv("PEXELS_API_KEY"):

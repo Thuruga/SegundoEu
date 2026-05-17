@@ -1,5 +1,6 @@
 import os
-from langchain_google_genai import ChatGoogleGenerativeAI
+import re
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from src.state import VideoState
 
@@ -8,13 +9,15 @@ def generate_script(state: VideoState) -> VideoState:
     Agent 1: Scriptwriter.
     Generates a philosophical, reflective 1-minute script based on the topic,
     and extracts 3 visually evocative keywords for background video search.
+    Using Groq API for blazing fast Llama 3 generation.
     """
     print(f"--- Generating script for topic: '{state['topic']}' ---")
     
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-flash-latest",
+    # Iniciando o Llama 3.3 70B rodando nos processadores ultrarrápidos da Groq
+    llm = ChatGroq(
+        model="llama-3.3-70b-versatile",
         temperature=0.7,
-        max_tokens=400
+        max_tokens=1024
     )
     
     prompt = ChatPromptTemplate.from_messages([
@@ -22,34 +25,36 @@ def generate_script(state: VideoState) -> VideoState:
             "You are a 'Shortsophy' content creator. You write highly reflective, philosophical, "
             "and calm scripts for vertical short-form videos.\n\n"
             "STRICT RULES:\n"
-            "1. The spoken script MUST be written entirely in Brazilian Portuguese (pt-BR).\n"
-            "2. NEVER include stage directions, audio cues, 'Timing check', '(Pause)', or any annotations. Output ONLY the raw text to be spoken.\n"
-            "3. The script should take exactly 1 minute to read aloud slowly and calmly.\n\n"
-            "After the spoken script, on a new line, add exactly:\n"
-            "KEYWORDS: word1, word2, word3\n"
-            "where the 3 words are visually evocative English nouns suitable for searching "
-            "royalty-free background footage (e.g. 'nature, ocean, stars')."
+            "1. Write the script entirely in BRAZILIAN PORTUGUESE (pt-BR).\n"
+            "2. NO stage directions, notes, titles, or introductions.\n"
+            "3. Length must be exactly around 120 words.\n"
+            "4. Output your response STRICTLY in the following XML format:\n\n"
+            "<script>\n[Insert the Brazilian Portuguese script here]\n</script>\n"
+            "<keywords>\n[Insert 3 visually evocative English nouns separated by commas, e.g., nature, rain, night]\n</keywords>"
         )),
-        ("human", "Topic: {topic}\nPlease write the script.")
+        ("human", "Topic: {topic}")
     ])
     
     chain = prompt | llm
-    
     response = chain.invoke({"topic": state["topic"]})
     
-    if isinstance(response.content, list):
-        raw = "".join([chunk.get("text", "") if isinstance(chunk, dict) else str(chunk) for chunk in response.content])
-    else:
-        raw = str(response.content)
+    raw = str(response.content)
 
-    # Parse script and keywords
-    if "KEYWORDS:" in raw:
-        script_part, keywords_raw = raw.rsplit("KEYWORDS:", 1)
-        script_text = script_part.strip()
-        keywords = [kw.strip() for kw in keywords_raw.strip().split(",") if kw.strip()]
+    # Extração segura usando Regex para evitar que qualquer formatação quebre
+    script_match = re.search(r"<script>(.*?)</script>", raw, re.DOTALL | re.IGNORECASE)
+    keywords_match = re.search(r"<keywords>(.*?)</keywords>", raw, re.DOTALL | re.IGNORECASE)
+
+    if script_match:
+        script_text = script_match.group(1).strip()
     else:
+        print("--- WARNING: API did not return <script> tags. Falling back to raw output. ---")
+        print(f"RAW OUTPUT: {raw}")
         script_text = raw.strip()
-        keywords = []
+
+    keywords = []
+    if keywords_match:
+        kw_text = keywords_match.group(1).strip()
+        keywords = [k.strip() for k in kw_text.split(",") if k.strip()]
 
     print(f"--- Script generated. Keywords: {keywords} ---")
     
