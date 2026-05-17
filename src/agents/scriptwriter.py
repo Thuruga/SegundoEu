@@ -26,11 +26,11 @@ def generate_script(state: VideoState) -> VideoState:
             "STRICT RULES:\n"
             "1. Write the script entirely in BRAZILIAN PORTUGUESE (pt-BR).\n"
             "2. NO stage directions, notes, titles, or introductions.\n"
-            "3. Length must be exactly around 120 words.\n"
+            "3. Length MUST be between 120 and 140 words in total.\n"
             "4. Output your response STRICTLY in the following XML format:\n\n"
             "<script>\n[Insert the Brazilian Portuguese script here]\n</script>\n"
             "<keywords>\n[Insert 3 visually evocative English concepts for dark/moody/minimalist B-roll search, separated by commas. NO literal terms. Use moody photography concepts, e.g., foggy night, walking alone dark, coffee dripping]\n</keywords>\n\n"
-            "5. You MUST format the script using line breaks (\\n) to dictate the visual rhythm of the subtitles. Each line must contain a strong thought unit (1 to 4 words max)."
+            "5. You MUST format the script using line breaks (\\n) to dictate the visual rhythm of the subtitles. Each line must group 2 to 5 words, forming a strong thought unit, WITHOUT shortening the total length of the story."
         )),
         ("human", "Topic: {topic}")
     ])

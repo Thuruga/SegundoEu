@@ -36,5 +36,7 @@ progress:
 |---|---|---|
 | `scriptwriter-visual-rhythm` | 2026-05-17 | Atualização do ritmo visual (regra 5) e keywords dark/moody/minimalist no scriptwriter |
 | `video-editor-dark-overlay` | 2026-05-17 | Alterações estéticas na fonte (Montserrat-Black 90px) e adição de dark overlay (opacidade 0.35) no video_editor |
+| `scriptwriter-word-count-rhythm` | 2026-05-17 | Ajuste das STRICT RULES para 120-140 palavras (Regra 3) e legendas de 2-5 palavras sem encurtar a história (Regra 5) |
+
 
 
