@@ -22,7 +22,9 @@ OUTPUT_WIDTH = 1080
 OUTPUT_HEIGHT = 1920
 TARGET_FPS = 30
 
-FONT_PATH = "./assets/fonts/Montserrat-Black.ttf"
+# Resolve font path relative to project root (2 levels up from this file)
+_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+FONT_PATH = os.path.join(_PROJECT_ROOT, "assets", "fonts", "Montserrat-Black.ttf")
 FONT_SIZE = 65
 STROKE_WIDTH = 4
 
@@ -76,8 +78,10 @@ def _render_subtitle_frame(text: str, width: int, height: int, y_center: int) ->
 
     try:
         font = ImageFont.truetype(FONT_PATH, FONT_SIZE)
-    except (IOError, OSError):
-        # Fallback to a default font if the preferred one is missing
+    except (IOError, OSError) as e:
+        # LOUD warning — fallback font will look wrong
+        print(f"    ⚠️  WARNING: Could not load font '{FONT_PATH}': {e}")
+        print(f"    ⚠️  Falling back to default font — subtitles will look generic!")
         font = ImageFont.load_default()
 
     # Measure text dimensions
