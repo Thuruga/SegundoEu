@@ -6,7 +6,7 @@
 |---|-------|------|--------------|------------------|
 | 1 | LangGraph & Scripting | 1/1 | Complete   | 2026-05-17 |
 | 2 | Audio & Media Collection | As a content creator, I want to automatically generate voiceovers and download corresponding vertical videos, so that I have the audio and video assets ready for final video assembly. | GEN-02, GEN-03 | Complete | 2026-05-17 |
-| 3 | Video Assembly | Implement Agent 4 to composite audio, video, and subtitles. | GEN-04 | 2 |
+| 3 | Video Assembly | 3/1 | Complete   | 2026-05-17 |
 | 4 | Review UI & YouTube Upload | Build review frontend and YouTube publishing integration. | PUB-01, PUB-02, PUB-03 | 3 |
 
 ## Phase Details
