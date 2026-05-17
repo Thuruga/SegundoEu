@@ -30,7 +30,8 @@ def generate_script(state: VideoState) -> VideoState:
             "4. You MUST use *asterisks* to mark words of emphasis (e.g., 'O tempo não é *dinheiro*'). Emphasize 1 or 2 key words per sentence to guide the voice actor's intonation and create dynamic subtitles.\n"
             "5. Output your response STRICTLY in the following XML format:\n"
             "<script>\n[Your pt-BR script here]\n</script>\n"
-            "<keywords>\n[EXACTLY 3 to 4 completely DISTINCT and abstract visual concepts in ENGLISH, separated by commas. These will serve as different B-roll Scenes throughout the video. They MUST be dark, moody, cinematic photography concepts. NEVER use literal Portuguese words. NEVER use abstract nouns like 'time' or 'life'. Use atmospheric visual scenes like: 'rain on window', 'abandoned clock tower', 'flickering streetlight', 'distant mountain peak'.]\n</keywords>\n\n"
+            "<keywords>\n[EXACTLY 3 to 4 completely DISTINCT and abstract visual concepts in ENGLISH, separated by commas. These will serve as different B-roll Scenes throughout the video. They MUST be dark, moody, cinematic photography concepts. NEVER use literal Portuguese words. NEVER use abstract nouns like 'time' or 'life'. Use atmospheric visual scenes like: 'rain on window', 'abandoned clock tower', 'flickering streetlight', 'distant mountain peak'.]\n</keywords>\n"
+            "<sfx>\n[A SHORT prompt in ENGLISH describing a cinematic sound effect that matches the theme and mood of the script. Think: dark ambient textures, bass drops, whooshes, risers, reverb hits. Example: 'cinematic dark whoosh, heavy bass drop, suspense'.]\n</sfx>\n\n"
             "EXAMPLE OF THE EXPECTED OUTPUT FORMAT:\n"
             "<script>\n"
             "O tempo *não espera* por ninguém que se distraia. "
@@ -50,7 +51,10 @@ def generate_script(state: VideoState) -> VideoState:
             "</script>\n"
             "<keywords>\n"
             "abandoned clock tower, stormy ocean waves, dying candle flame, cracked desert earth\n"
-            "</keywords>"
+            "</keywords>\n"
+            "<sfx>\n"
+            "cinematic dark whoosh, heavy bass drop, suspense\n"
+            "</sfx>"
         )),
         ("human", "Topic: {topic}")
     ])
@@ -63,6 +67,7 @@ def generate_script(state: VideoState) -> VideoState:
     # Extração segura usando Regex para evitar que qualquer formatação quebre
     script_match = re.search(r"<script>(.*?)</script>", raw, re.DOTALL | re.IGNORECASE)
     keywords_match = re.search(r"<keywords>(.*?)</keywords>", raw, re.DOTALL | re.IGNORECASE)
+    sfx_match = re.search(r"<sfx>(.*?)</sfx>", raw, re.DOTALL | re.IGNORECASE)
 
     if script_match:
         script_text = script_match.group(1).strip()
@@ -76,11 +81,16 @@ def generate_script(state: VideoState) -> VideoState:
         kw_text = keywords_match.group(1).strip()
         keywords = [k.strip() for k in kw_text.split(",") if k.strip()]
 
-    print(f"--- Script generated. Keywords: {keywords} ---")
+    sfx_prompt = ""
+    if sfx_match:
+        sfx_prompt = sfx_match.group(1).strip()
+
+    print(f"--- Script generated. Keywords: {keywords} | SFX prompt: '{sfx_prompt}' ---")
     
     new_state = state.copy()
     new_state["script"] = script_text
     new_state["keywords"] = keywords
+    new_state["sfx_prompt"] = sfx_prompt
     new_state["status"] = "script_generated"
     
     return new_state

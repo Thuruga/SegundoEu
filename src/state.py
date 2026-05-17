@@ -12,4 +12,6 @@ class VideoState(TypedDict):
     keywords: Optional[List[str]]
     video_needs_loop: Optional[bool]
     subtitles_path: Optional[str]
+    sfx_prompt: Optional[str]
+    sfx_path: Optional[str]
     status: str
