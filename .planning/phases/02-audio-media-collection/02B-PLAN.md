@@ -85,7 +85,7 @@ Implement Agent 3 (Media Researcher) that queries the Pexels API for a portrait-
   <title>Update main.py to reflect new state fields and pipeline output</title>
   <action>
     In `src/main.py`:
-    1. Add `PEXELS_API_KEY` guard: after the `GOOGLE_API_KEY` check, add a check for `os.getenv("PEXELS_API_KEY")` with error message `"Error: PEXELS_API_KEY not set. Please add it to your .env file."`.
+    1. Add `PEXELS_API_KEY` guard: after the `GROQ_API_KEY` check, add a check for `os.getenv("PEXELS_API_KEY")` with error message `"Error: PEXELS_API_KEY not set. Please add it to your .env file."`.
     2. Extend `initial_state` with the new fields:
        ```python
        keywords=None,

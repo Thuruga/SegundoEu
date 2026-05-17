@@ -58,7 +58,7 @@ Implement Agent 2 (Voice Actor) to generate TTS audio and Agent 3 (Media Researc
 - Modular agent setup located inside the `src/agents/` directory. Each agent takes the state, processes it, and returns an updated state copy.
 
 ### Integration Points
-- Add `PEXELS_API_KEY` alongside `GOOGLE_API_KEY` via `dotenv` in `src/main.py`.
+- Add `PEXELS_API_KEY` alongside `GROQ_API_KEY` via `dotenv` in `src/main.py`.
 - Extend the LangGraph workflow in `src/graph.py` by adding nodes for `voice_actor` and `media_researcher`.
 
 </code_context>

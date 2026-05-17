@@ -13,11 +13,11 @@ updated: 2026-05-17T14:34:00Z
 ## Tests
 
 ### 1. Cold Start Smoke Test
-expected: Start the application from scratch using `python src/main.py`. It boots without syntax errors and correctly identifies if the `GOOGLE_API_KEY` is missing by exiting gracefully with an error message.
+expected: Start the application from scratch using `python src/main.py`. It boots without syntax errors and correctly identifies if the `GROQ_API_KEY` is missing by exiting gracefully with an error message.
 result: pass
 
 ### 2. Generate Script
-expected: When `GOOGLE_API_KEY` is set, running `python src/main.py` should trigger the pipeline, generate a 1-minute reflective script via Gemini Pro, and output the script text to the console, ending with `Final Status: script_generated`.
+expected: When `GROQ_API_KEY` is set, running `python src/main.py` should trigger the pipeline, generate a 1-minute reflective script via Gemini Pro, and output the script text to the console, ending with `Final Status: script_generated`.
 result: pass
 
 ## Summary

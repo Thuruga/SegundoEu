@@ -47,7 +47,7 @@ Setup LangGraph state, orchestrator, and Agent 1 to generate scripts using Gemin
 - Standard Python 3 LangGraph application pattern.
 
 ### Integration Points
-- Gemini API token setup via environment variables (`GOOGLE_API_KEY`).
+- Gemini API token setup via environment variables (`GROQ_API_KEY`).
 
 </code_context>
 

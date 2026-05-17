@@ -14,7 +14,7 @@ updated: 2026-05-17T15:31:00Z
 
 ### 1. Cold Start and Setup Validation (User Flow)
 expected: |
-  Ensure GOOGLE_API_KEY, PEXELS_API_KEY, and PIXABAY_API_KEY are configured in `.env`.
+  Ensure GROQ_API_KEY, PEXELS_API_KEY, and PIXABAY_API_KEY are configured in `.env`.
   Run the application using `python src/main.py`.
   The script should boot without syntax errors, output "Starting Shortsophy Pipeline for topic: The meaning of time",
   and verify all required environment variables are set.
