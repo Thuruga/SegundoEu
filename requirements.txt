@@ -1,5 +1,4 @@
 langgraph
-langchain-google-genai
 python-dotenv
 edge-tts
 requests
