@@ -4,8 +4,8 @@
 
 | # | Phase | Goal | Requirements | Success Criteria |
 |---|-------|------|--------------|------------------|
-| 1 | LangGraph & Scripting | Setup LangGraph state and Agent 1 to generate scripts. | GEN-01, GEN-05 | 2 |
-| 2 | Audio & Media Collection | Implement Agents 2 & 3 for TTS and Pexels video downloads. | GEN-02, GEN-03 | 2 |
+| 1 | LangGraph & Scripting | 1/1 | Complete   | 2026-05-17 |
+| 2 | Audio & Media Collection | As a content creator, I want to automatically generate voiceovers and download corresponding vertical videos, so that I have the audio and video assets ready for final video assembly. | GEN-02, GEN-03 | 2 |
 | 3 | Video Assembly | Implement Agent 4 to composite audio, video, and subtitles. | GEN-04 | 2 |
 | 4 | Review UI & YouTube Upload | Build review frontend and YouTube publishing integration. | PUB-01, PUB-02, PUB-03 | 3 |
 
@@ -20,7 +20,7 @@
 2. Agent 1 successfully queries Gemini Pro to generate a ~1-minute philosophical script.
 
 ### Phase 2: Audio & Media Collection
-**Goal:** Implement Agents 2 & 3 for TTS and Pexels video downloads.
+**Goal:** As a content creator, I want to automatically generate voiceovers and download corresponding vertical videos, so that I have the audio and video assets ready for final video assembly.
 **Mode:** mvp
 **Requirements:** GEN-02, GEN-03
 **Success Criteria:**
