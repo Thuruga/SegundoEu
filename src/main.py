@@ -33,6 +33,7 @@ def main():
         final_video_path=None,
         keywords=None,
         video_needs_loop=None,
+        subtitles_path=None,
         status="started"
     )
 
@@ -40,11 +41,13 @@ def main():
     result = app.invoke(initial_state)
 
     print("\n--- Pipeline Execution Complete ---")
-    print(f"Final Status: {result['status']}")
-    print(f"Keywords:     {result.get('keywords', [])}")
-    print(f"Audio Path:   {result.get('audio_path', 'N/A')}")
-    print(f"Video Path:   {result.get('video_path', 'N/A')}")
-    print(f"Video Loop:   {result.get('video_needs_loop', False)}")
+    print(f"Final Status:    {result['status']}")
+    print(f"Keywords:        {result.get('keywords', [])}")
+    print(f"Audio Path:      {result.get('audio_path', 'N/A')}")
+    print(f"Subtitles Path:  {result.get('subtitles_path', 'N/A')}")
+    print(f"Video Path:      {result.get('video_path', 'N/A')}")
+    print(f"Video Loop:      {result.get('video_needs_loop', False)}")
+    print(f"Final Video:     {result.get('final_video_path', 'N/A')}")
     print("\nGenerated Script:")
     print("-" * 40)
     print(result["script"])
