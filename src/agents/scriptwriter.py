@@ -12,7 +12,7 @@ def generate_script(state: VideoState) -> VideoState:
     print(f"--- Generating script for topic: '{state['topic']}' ---")
     
     llm = ChatGoogleGenerativeAI(
-        model="gemini-flash-latest",
+        model="gemini-3.1-pro-preview",
         temperature=0.7,
         max_tokens=400
     )
