@@ -14,6 +14,10 @@ def main():
         print("Error: PEXELS_API_KEY is not set. Please add it to your .env file.")
         return
 
+    if not os.getenv("PIXABAY_API_KEY"):
+        print("Error: PIXABAY_API_KEY is not set. Please add it to your .env file.")
+        return
+
     topic = "The meaning of time"
     print(f"Starting Shortsophy Pipeline for topic: {topic}\n")
 
