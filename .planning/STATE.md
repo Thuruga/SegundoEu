@@ -47,6 +47,7 @@ progress:
 | `video-editor-dynamic-improvements` | 2026-05-17 | Concatenamento múltiplo de vídeos, coloração dinâmica de asteriscos e suporte de áudio a SFX |
 | `sfx-prompt-tag` | 2026-05-17 | Nova tag `<sfx>` no scriptwriter para gerar prompts de efeitos sonoros cinematográficos e novos campos sfx_prompt/sfx_path no state |
 | `sfx-generator-agent` | 2026-05-17 | Novo agente `sfx_generator.py` que gera SFX via HuggingFace AudioLDM-S API com fallback gracioso |
+| `integrate-sfx-graph` | 2026-05-17 | Integração do nó `sfx_generator` no grafo LangGraph (`graph.py`) e atualização do schema de logs em `main.py` |
 
 
 

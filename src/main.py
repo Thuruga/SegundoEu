@@ -29,11 +29,13 @@ def main():
         topic=topic,
         script=None,
         audio_path=None,
-        video_path=None,
+        video_paths=None,
         final_video_path=None,
         keywords=None,
         video_needs_loop=None,
         subtitles_path=None,
+        sfx_prompt=None,
+        sfx_path=None,
         status="started"
     )
 
@@ -43,10 +45,11 @@ def main():
     print("\n--- Pipeline Execution Complete ---")
     print(f"Final Status:    {result['status']}")
     print(f"Keywords:        {result.get('keywords', [])}")
+    print(f"SFX Prompt:      {result.get('sfx_prompt', 'N/A')}")
+    print(f"SFX Path:        {result.get('sfx_path', 'N/A')}")
     print(f"Audio Path:      {result.get('audio_path', 'N/A')}")
     print(f"Subtitles Path:  {result.get('subtitles_path', 'N/A')}")
-    print(f"Video Path:      {result.get('video_path', 'N/A')}")
-    print(f"Video Loop:      {result.get('video_needs_loop', False)}")
+    print(f"Video Paths:     {result.get('video_paths', 'N/A')}")
     print(f"Final Video:     {result.get('final_video_path', 'N/A')}")
     print("\nGenerated Script:")
     print("-" * 40)
