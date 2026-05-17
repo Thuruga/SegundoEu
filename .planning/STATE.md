@@ -46,6 +46,8 @@ progress:
 | `media-researcher-iteration` | 2026-05-17 | Lógica iterativa no media_researcher para descarregar múltiplos vídeos HD para cada keyword e agregá-los na lista video_paths do state |
 | `video-editor-dynamic-improvements` | 2026-05-17 | Concatenamento múltiplo de vídeos, coloração dinâmica de asteriscos e suporte de áudio a SFX |
 | `sfx-prompt-tag` | 2026-05-17 | Nova tag `<sfx>` no scriptwriter para gerar prompts de efeitos sonoros cinematográficos e novos campos sfx_prompt/sfx_path no state |
+| `sfx-generator-agent` | 2026-05-17 | Novo agente `sfx_generator.py` que gera SFX via HuggingFace AudioLDM-S API com fallback gracioso |
+
 
 
 
