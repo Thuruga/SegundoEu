@@ -23,11 +23,11 @@ OUTPUT_HEIGHT = 1920
 TARGET_FPS = 30
 
 FONT_PATH = "./assets/fonts/Montserrat-Black.ttf"
-FONT_SIZE = 90
-STROKE_WIDTH = 8
+FONT_SIZE = 65
+STROKE_WIDTH = 4
 
-# Subtitle position: lower-middle (73% down the canvas)
-SUBTITLE_Y = int(OUTPUT_HEIGHT * 0.73)
+# Subtitle position: middle (60% down the canvas)
+SUBTITLE_Y = int(OUTPUT_HEIGHT * 0.60)
 
 # Music ducking: keep music very low so voiceover dominates
 MUSIC_VOLUME = 0.08
@@ -166,7 +166,7 @@ def assemble_video(state: VideoState) -> VideoState:
     dark_overlay = (
         ColorClip(size=(OUTPUT_WIDTH, OUTPUT_HEIGHT), color=[0, 0, 0])
         .with_duration(total_duration)
-        .with_opacity(0.35)
+        .with_opacity(0.35) # Ajuste entre 0.3 e 0.5 conforme o gosto
     )
 
     # 4. Parse subtitles and build ImageClip overlays
@@ -206,10 +206,12 @@ def assemble_video(state: VideoState) -> VideoState:
         print("    No music files found in assets/music/ – using voiceover only")
 
     # 6. Composite all layers: background + subtitles
-    all_layers = [bg_cropped, dark_overlay] + subtitle_clips
+    all_layers = [bg_cropped] + subtitle_clips
     final_video = CompositeVideoClip(all_layers, size=(OUTPUT_WIDTH, OUTPUT_HEIGHT))
     final_video = final_video.with_audio(final_audio)
     final_video = final_video.with_duration(total_duration)
+
+    all_layers = [bg_cropped, dark_overlay] + subtitle_clips
 
     # 7. Export
     os.makedirs("assets/output", exist_ok=True)
